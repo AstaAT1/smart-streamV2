@@ -11,6 +11,7 @@ const musique = document.querySelector('#musique')
 const channelsList = document.querySelector('#channelsList')
 const searchChannel = document.querySelector('#searchChannel')
 let currentChannels = []
+let isFavorite
 
 function showCategory() {
     category.classList.remove('hidden')
@@ -78,9 +79,10 @@ export function renderChannels(arr) {
     console.log("renderChannels called", arr.length)
     channelsList.innerHTML = arr.map(function (channel) {
         return `
-<div class=" channel-card flex items-center gap-4 bg-[#202020] border border-white/10 rounded-xl p-4 cursor-pointer hover:border-red-600 hover:bg-red-950/20 transition">
+<div class=" channel-card flex justify-between items-center gap-4 bg-[#202020] border border-white/10 rounded-xl p-4 cursor-pointer ">
 
-    <div class="w-14 h-14 shrink-0 bg-[#303030] rounded-lg flex items-center justify-center overflow-hidden">
+    <div class="flex items-center justify-center gap-2">
+    <div class="w-14 h-14  bg-[#303030] rounded-lg flex items-center justify-center overflow-hidden">
         <img
             src="${channel.logo}"
             alt="${channel.name}"
@@ -88,7 +90,7 @@ export function renderChannels(arr) {
         >
     </div>
 
-    <div class="flex flex-col gap-2 min-w-0">
+    <div class="flex flex-col gap-2 ">
         <span class="text-xs font-semibold text-red-500">
             CH ${channel.channelNumber}
         </span>
@@ -101,8 +103,12 @@ export function renderChannels(arr) {
             ${channel.category}
         </span>
     </div>
-
-    <i class="fa-solid fa-chevron-right text-gray-500 ml-auto"></i>
+    </div>
+    
+    <div class="flex gap-3">
+    <i class="fa-solid fa-ban text-2xl text-gray-500 "></i>
+    <i class="fa-regular fa-star text-2xl text-gray-500 "></i>
+    </div>
 
 </div> `
     }).join("")
