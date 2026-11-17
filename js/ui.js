@@ -1,4 +1,4 @@
-import {searchChannels} from './search.js'
+import { searchChannels } from './search.js'
 const category = document.querySelector('#categoryView')
 const section1 = document.querySelector('#section1')
 const section2 = document.querySelector('#section2')
@@ -11,7 +11,7 @@ const musique = document.querySelector('#musique')
 const channelsList = document.querySelector('#channelsList')
 const searchChannel = document.querySelector('#searchChannel')
 let currentChannels = []
-let isFavorite
+// let isFavorite
 
 function showCategory() {
     category.classList.remove('hidden')
@@ -34,36 +34,36 @@ export function change(arr) {
     films.addEventListener('click', function () {
         showCategory()
         const arrdata = filterByCategory(arr, 'Films')
-                currentChannels = arrdata
-            renderChannels(currentChannels)
+        currentChannels = arrdata
+        renderChannels(currentChannels)
     })
 
     series.addEventListener('click', function () {
         showCategory()
         const arrdata = filterByCategory(arr, 'Séries')
-                currentChannels = arrdata
-            renderChannels(currentChannels)
+        currentChannels = arrdata
+        renderChannels(currentChannels)
     })
 
     sports.addEventListener('click', function () {
         showCategory()
         const arrdata = filterByCategory(arr, 'Sports')
-                currentChannels = arrdata
-              renderChannels(currentChannels)
+        currentChannels = arrdata
+        renderChannels(currentChannels)
     })
 
     musique.addEventListener('click', function () {
         showCategory()
         const arrdata = filterByCategory(arr, 'Musique')
-                currentChannels = arrdata
-              renderChannels(currentChannels)
+        currentChannels = arrdata
+        renderChannels(currentChannels)
     })
 
     actualites.addEventListener('click', function () {
         showCategory()
         const arrdata = filterByCategory(arr, 'Actualités')
-                currentChannels = arrdata
-              renderChannels(currentChannels)
+        currentChannels = arrdata
+        renderChannels(currentChannels)
     })
     handelSearch()
 }
@@ -78,6 +78,7 @@ export function filterByCategory(channels, selectedCategory) {
 export function renderChannels(arr) {
     console.log("renderChannels called", arr.length)
     channelsList.innerHTML = arr.map(function (channel) {
+        
         return `
 <div class=" channel-card flex justify-between items-center gap-4 bg-[#202020] border border-white/10 rounded-xl p-4 cursor-pointer ">
 
@@ -106,36 +107,59 @@ export function renderChannels(arr) {
     </div>
     
     <div class="flex gap-3">
-    <i class="fa-solid fa-ban text-2xl text-gray-500 "></i>
-    <i class="fa-regular fa-star text-2xl text-gray-500 "></i>
+    <i class="fa-solid fa-ban text-2xl ban text-gray-500 "></i>
+    <i class="fa-star favorite text-2xl ${channel.isFavorite ? 'fa-solid text-yellow-500' : 'fa-regular text-gray-500'}"></i>
     </div>
 
 </div> `
     }).join("")
-    function selectChannel(arr) {
     const cardChannel = document.querySelectorAll('.channel-card')
-    const previewImage = document.querySelector('#previewImage')
-    const previewName = document.querySelector('#previewName')
-    console.log(cardChannel.length)
-    console.log("Cards found:", cardChannel.length)
-    cardChannel.forEach( function(e , index){
-        e.addEventListener('click' , function () {
-            const selectedChannel = arr[index]
-            previewImage.src = selectedChannel.previewImage
-            previewName.textContent = selectedChannel.name
-            previewImage.classList.remove('hidden')
-            console.log(selectedChannel)
+
+    const favorite = document.querySelectorAll('.favorite')
+    favorite.forEach(function (e , index) {
+        e.addEventListener('click', function (event) {
+            event.stopPropagation()
+            const favoriteIndex = arr[index]
+            if (!favoriteIndex.isFavorite) {
+                favoriteIndex.isFavorite = true
+                e.classList.add('fa-solid')
+                e.classList.remove('fa-regular')
+                e.classList.add('text-yellow-500')
+                e.classList.remove('text-gray-500')
+                
+            }
+            else{
+                favoriteIndex.isFavorite = false
+                e.classList.remove('fa-solid')
+                e.classList.add('fa-regular')
+                e.classList.remove('text-yellow-500')
+                e.classList.add('text-gray-500')
+            }
+
         })
     })
-}
-selectChannel(arr)
+    function selectChannel(arr) {
+
+        const previewImage = document.querySelector('#previewImage')
+        const previewName = document.querySelector('#previewName')
+        console.log(cardChannel.length)
+        console.log("Cards found:", cardChannel.length)
+        cardChannel.forEach(function (e, index) {
+            e.addEventListener('click', function () {
+                const selectedChannel = arr[index]
+                previewImage.src = selectedChannel.previewImage
+                previewName.textContent = selectedChannel.name
+                previewImage.classList.remove('hidden')
+                console.log(selectedChannel)
+            })
+        })
+    }
+    selectChannel(arr)
 }
 function handelSearch() {
-    searchChannel.addEventListener('input' , function () {
+    searchChannel.addEventListener('input', function () {
         const valueSearch = searchChannel.value.trim()
-        const result = searchChannels(currentChannels , valueSearch)
+        const result = searchChannels(currentChannels, valueSearch)
         renderChannels(result)
     })
 }
-
-
