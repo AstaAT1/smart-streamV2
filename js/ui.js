@@ -1,4 +1,5 @@
 import { searchChannels } from './search.js'
+import { updateFavorite } from '../services/api.js'
 const category = document.querySelector('#categoryView')
 const section1 = document.querySelector('#section1')
 const section2 = document.querySelector('#section2')
@@ -10,8 +11,10 @@ const actualites = document.querySelector('#actualites')
 const musique = document.querySelector('#musique')
 const channelsList = document.querySelector('#channelsList')
 const searchChannel = document.querySelector('#searchChannel')
+const isFavorite = document.querySelector('.isFavorite')
 let currentChannels = []
 // let isFavorite
+
 
 function showCategory() {
     category.classList.remove('hidden')
@@ -64,6 +67,11 @@ export function change(arr) {
         const arrdata = filterByCategory(arr, 'Actualités')
         currentChannels = arrdata
         renderChannels(currentChannels)
+    })
+
+    isFavorite.addEventListener('click' , function () {
+           const arrdata = arr.filter(p => p.isFavorite === true)
+           renderChannels(arrdata)
     })
     handelSearch()
 }
@@ -135,6 +143,7 @@ export function renderChannels(arr) {
                 e.classList.remove('text-yellow-500')
                 e.classList.add('text-gray-500')
             }
+            updateFavorite(favoriteIndex)
 
         })
     })
