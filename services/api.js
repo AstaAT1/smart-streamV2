@@ -35,7 +35,6 @@ export function updateFavorite(channel){
    const response = fetch(`${url}/${channel.id}` , {
     method:"PUT",
     headers:{
-        
         "Content-Type":"application/json"
     },
     body:JSON.stringify(channel)
@@ -43,5 +42,24 @@ export function updateFavorite(channel){
     })
     console.log(channel.id)
     return response
+}
 
+export function updateBlackList(channel) {
+    const response = fetch(`${url}/${channel.id}` , {
+        method:"PUT",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify(channel)
+    })
+    console.log(`${channel.id} for black list`)
+    return response
+}
+
+export async function DeleteChannel(channel) {
+        const response = await fetch(`${url}/${channel.id}` , {
+        method:"DELETE"
+    })
+
+    return await response.json()
 }

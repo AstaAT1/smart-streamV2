@@ -1,5 +1,5 @@
 import { searchChannels } from './search.js'
-import { updateFavorite } from '../services/api.js'
+import { updateFavorite, updateBlackList, DeleteChannel } from '../services/api.js'
 const category = document.querySelector('#categoryView')
 const section1 = document.querySelector('#section1')
 const section2 = document.querySelector('#section2')
@@ -12,6 +12,7 @@ const musique = document.querySelector('#musique')
 const channelsList = document.querySelector('#channelsList')
 const searchChannel = document.querySelector('#searchChannel')
 const isFavorite = document.querySelector('.isFavorite')
+const isBlackList = document.querySelector('.isBlackList')
 let currentChannels = []
 // let isFavorite
 
@@ -69,15 +70,19 @@ export function change(arr) {
         renderChannels(currentChannels)
     })
 
-    isFavorite.addEventListener('click' , function () {
-           const arrdata = arr.filter(p => p.isFavorite === true)
-           renderChannels(arrdata)
+    isFavorite.addEventListener('click', function () {
+        const arrdata = arr.filter(p => p.isFavorite === true && p.isBlacklisted === false)
+        renderChannels(arrdata)
+    })
+    isBlackList.addEventListener('click', function () {
+        const arrdata = arr.filter(p => p.isBlacklisted === true)
+        renderChannels(arrdata)
     })
     handelSearch()
 }
 export function filterByCategory(channels, selectedCategory) {
     const filterCategory = channels.filter(function (channel) {
-        return selectedCategory === channel.category
+        return channel.category === selectedCategory && channel.isBlacklisted === false
     })
 
     return filterCategory
@@ -86,7 +91,7 @@ export function filterByCategory(channels, selectedCategory) {
 export function renderChannels(arr) {
     console.log("renderChannels called", arr.length)
     channelsList.innerHTML = arr.map(function (channel) {
-        
+
         return `
 <div class=" channel-card flex justify-between items-center gap-4 bg-[#202020] border border-white/10 rounded-xl p-4 cursor-pointer ">
 
@@ -115,16 +120,62 @@ export function renderChannels(arr) {
     </div>
     
     <div class="flex gap-3">
-    <i class="fa-solid fa-ban text-2xl ban text-gray-500 "></i>
-    <i class="fa-star favorite text-2xl ${channel.isFavorite ? 'fa-solid text-yellow-500' : 'fa-regular text-gray-500'}"></i>
+    <i class="fa-solid  blackList text-2xl ${channel.isBlacklisted ? 'text-red-500 fa-trash' : 'text-gray-500 fa-ban'}"></i>
+    <span class="${channel.isBlacklisted ? 'hidden' : ''}"><i class="fa-star  favorite text-2xl ${channel.isFavorite ? 'fa-solid text-yellow-500' : 'fa-regular text-gray-500'}  "></i></span>
+    <span class="${channel.isBlacklisted ? '' : 'hidden'}"><i class="fa-solid fa-rotate-left  restore text-2xl text-red-500"></i></span>
     </div>
 
 </div> `
     }).join("")
     const cardChannel = document.querySelectorAll('.channel-card')
-
     const favorite = document.querySelectorAll('.favorite')
-    favorite.forEach(function (e , index) {
+    const blackList = document.querySelectorAll('.blackList')
+    const restore = document.querySelectorAll('.restore')
+
+    restore.forEach(function (e, index) {
+        e.addEventListener('click', function (event) {
+            event.stopPropagation()
+            const restoreIndex = arr[index]
+            restoreIndex.isBlacklisted = false
+            updateBlackList(restoreIndex)
+            const arrdata = arr.filter(p => p.isBlacklisted === true)
+            renderChannels(arrdata)
+        })
+
+
+    })
+
+    blackList.forEach(function (e, index) {
+        e.addEventListener('click', function (event) {
+            event.stopPropagation()
+            const blackListIndex = arr[index]
+            if (!blackListIndex.isBlacklisted) {
+                blackListIndex.isBlacklisted = true
+                e.classList.remove('text-gray-500')
+                e.classList.add('text-red-500')
+                e.classList.remove('fa-ban')
+                e.classList.add('fa-trash')
+                cardChannel[index].classList.add('hidden')
+                updateBlackList(blackListIndex)
+
+
+            }
+            else {
+                const confirmation = confirm("Do you want to delete this channel ?")
+
+                if (confirmation) {
+                    DeleteChannel(blackListIndex).then(function () {
+                        const update = arr.filter(p => p.id !== blackListIndex.id)
+                        renderChannels(update)
+                    })
+                }
+            }
+            updateBlackList(blackListIndex)
+        })
+    })
+
+
+    favorite.forEach(function (e, index) {
         e.addEventListener('click', function (event) {
             event.stopPropagation()
             const favoriteIndex = arr[index]
@@ -134,9 +185,9 @@ export function renderChannels(arr) {
                 e.classList.remove('fa-regular')
                 e.classList.add('text-yellow-500')
                 e.classList.remove('text-gray-500')
-                
+
             }
-            else{
+            else {
                 favoriteIndex.isFavorite = false
                 e.classList.remove('fa-solid')
                 e.classList.add('fa-regular')
